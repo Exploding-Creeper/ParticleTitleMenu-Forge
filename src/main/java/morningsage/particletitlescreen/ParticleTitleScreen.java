@@ -2,16 +2,20 @@ package morningsage.particletitlescreen;
 
 import morningsage.particletitlescreen.config.ConfigFileHandler;
 import morningsage.particletitlescreen.config.ModConfig;
-import morningsage.particletitlescreen.events.TitleScreenCreatedEvent;
-import net.fabricmc.api.ClientModInitializer;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-public class ParticleTitleScreen implements ClientModInitializer {
+import static morningsage.particletitlescreen.ParticleTitleScreen.MOD_ID;
+
+@Mod(MOD_ID)
+public class ParticleTitleScreen {
+
 	public static final String MOD_ID = "particletitlescreen";
 	public static final ConfigFileHandler configFileHandler = new ConfigFileHandler(ModConfig.class, MOD_ID);
 	public static ParticleScreenManager particleScreenManager;
 
-	@Override
-	public void onInitializeClient() {
-		TitleScreenCreatedEvent.ON_CREATED.register(() -> particleScreenManager = new ParticleScreenManager());
+	public ParticleTitleScreen() {
+
 	}
+
 }

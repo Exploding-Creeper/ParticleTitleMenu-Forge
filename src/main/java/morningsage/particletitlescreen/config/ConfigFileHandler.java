@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.Minecraft;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -47,7 +47,7 @@ public class ConfigFileHandler {
     }
 
     private void setup() {
-        final File configDir = new File(FabricLoader.getInstance().getConfigDirectory(), modId);
+        final File configDir = new File(Minecraft.getInstance().gameDirectory + "/config", modId);
 
         if (!configDir.exists() && !configDir.mkdirs()) return;
 
@@ -72,7 +72,7 @@ public class ConfigFileHandler {
     }
 
     public boolean saveConfigs() {
-        final File configDir = new File(FabricLoader.getInstance().getConfigDirectory(), modId);
+        final File configDir = new File(Minecraft.getInstance().gameDirectory + "/config", modId);
 
         try {
             //Save the configs

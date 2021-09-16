@@ -2,15 +2,15 @@ package morningsage.particletitlescreen.utils;
 
 import morningsage.particletitlescreen.Particle;
 import morningsage.particletitlescreen.ducks.Vec2fDuck;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.client.MainWindow;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.vector.Vector2f;
 
 import java.util.Random;
 
 public final class RandomUtils {
     private static final Random random = new Random();
-    private static final Window minecraftWindow = MinecraftClient.getInstance().getWindow();
+    private static final MainWindow minecraftWindow = Minecraft.getInstance().getWindow();
 
     public static float getRandomFloat(float min, float max) {
         return min + random.nextFloat() * (max - min);
@@ -20,20 +20,20 @@ public final class RandomUtils {
     }
 
     private static float getRandomX() {
-        return getRandomFloat(0, minecraftWindow.getScaledWidth());
+        return getRandomFloat(0, minecraftWindow.getGuiScaledWidth());
     }
 
     private static float getRandomY() {
-        return getRandomFloat(0, minecraftWindow.getScaledHeight());
+        return getRandomFloat(0, minecraftWindow.getGuiScaledHeight());
     }
 
-    public static Vec2f getRandomLocation() {
-        return new Vec2f(getRandomX(), getRandomY());
+    public static Vector2f getRandomLocation() {
+        return new Vector2f(getRandomX(), getRandomY());
     }
 
     public static void moveParticleIfNeeded(Particle particle, boolean bounce) {
-        int width  = minecraftWindow.getScaledWidth();
-        int height = minecraftWindow.getScaledHeight();
+        int width  = minecraftWindow.getGuiScaledWidth();
+        int height = minecraftWindow.getGuiScaledWidth();
 
         Vec2fDuck location = (Vec2fDuck) particle.getLocationVec();
         float radius   = particle.getRadius();

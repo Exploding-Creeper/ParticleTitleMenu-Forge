@@ -1,11 +1,11 @@
 package morningsage.particletitlescreen.utils;
 
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.vector.Vector2f;
 import org.lwjgl.opengl.GL11;
 
 public final class RenderUtils {
 
-    public static void renderPoint(Vec2f location, float radius, int color, float opacity) {
+    public static void renderPoint(Vector2f location, float radius, int color, float opacity) {
         final float red   = (float)(color >> 16 & 255) / 255.0F;
         final float green = (float)(color >>  8 & 255) / 255.0F;
         final float blue  = (float)(color       & 255) / 255.0F;
@@ -25,7 +25,7 @@ public final class RenderUtils {
         GL11.glDisable(GL11.GL_POINT_SMOOTH);
         GL11.glDisable(GL11.GL_BLEND);
     }
-    public static void renderLine(Vec2f start, Vec2f end, float width, int color, float opacity) {
+    public static void renderLine(Vector2f start, Vector2f end, float width, int color, float opacity) {
         final float red   = (float)(color >> 16 & 255) / 255.0F;
         final float green = (float)(color >>  8 & 255) / 255.0F;
         final float blue  = (float)(color       & 255) / 255.0F;

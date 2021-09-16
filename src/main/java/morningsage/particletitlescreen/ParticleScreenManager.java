@@ -2,17 +2,15 @@ package morningsage.particletitlescreen;
 
 import lombok.var;
 import morningsage.particletitlescreen.config.ModConfig;
-import morningsage.particletitlescreen.events.MouseEvents;
-import morningsage.particletitlescreen.events.ResolutionChangedEvent;
-import morningsage.particletitlescreen.events.RotatingCubeMapEvents;
 import morningsage.particletitlescreen.utils.RandomUtils;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.Window;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.Vec2f;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.client.MainWindow;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.math.vector.Vector2f;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,25 +18,23 @@ import static morningsage.particletitlescreen.config.ModConfig.*;
 
 public class ParticleScreenManager {
     private final List<Particle> particles = new ArrayList<>();
-    private static final Vec2f ZERO = Vec2f.ZERO;
-    private @Nullable Vec2f mouseLocation = null;
-    private @Nullable Vec2f resolution = null;
+    private static final Vector2f ZERO = Vector2f.ZERO;
+    private @Nullable Vector2f mouseLocation = null;
+    private @Nullable Vector2f resolution = null;
     private @Nullable Double scale = null;
-    private static final Window window = MinecraftClient.getInstance().getWindow();
+    private static final MainWindow window = Minecraft.getInstance().getWindow();
 
     public ParticleScreenManager() {
         initParticles();
         initMouseEvents();
 
-        RotatingCubeMapEvents.ON_RENDER.register(this::onRender);
-        ResolutionChangedEvent.ON_CHANGED.register(this::initParticles);
     }
 
-    private void initParticles() {
+    public void initParticles() {
         particles.clear();
 
         int particleColor = Integer.decode(ModConfig.particleColor);
-        double particleCount = window.getFramebufferWidth() * window.getFramebufferHeight() / window.getScaleFactor() / 4000;
+        double particleCount = window.getWidth() * window.getHeight() / window.getGuiScale() / 4000;
 
         for (int i = 0; i < particleCount; i++) {
             var particleBuilder = Particle.builder();
@@ -68,23 +64,29 @@ public class ParticleScreenManager {
     }
     private void initMouseEvents() {
         if (!particleRepelledByMouse) return;
-
-        MouseEvents.ON_LEAVE.register(() -> mouseLocation = null);
-        MouseEvents.ON_MOVE.register((window, x, y) -> mouseLocation = new Vec2f((float) x, (float) y));
     }
-    private ActionResult onRender() {
+
+    public void onMouseLeave() {
+        mouseLocation = null;
+    }
+
+    public void onMouseMove(double x, double y) {
+        mouseLocation = new Vector2f((float) x, (float) y);
+    }
+
+    public ActionResultType onRender() {
         onRenderBackground();
         onRenderParticles();
 
-        if (resolution == null || resolution.x != window.getScaledWidth() || resolution.y != window.getScaledHeight()) {
-            resolution = new Vec2f(window.getScaledWidth(), window.getScaledHeight());
+        if (resolution == null || resolution.x != window.getGuiScaledWidth() || resolution.y != window.getGuiScaledHeight()) {
+            resolution = new Vector2f(window.getGuiScaledWidth(), window.getGuiScaledHeight());
         }
 
-        if (scale == null || scale != window.getScaleFactor()) {
-            scale = window.getScaleFactor();
+        if (scale == null || scale != window.getGuiScale()) {
+            scale = window.getGuiScale();
         }
 
-        return ActionResult.CONSUME;
+        return ActionResultType.CONSUME;
     }
     private static void onRenderBackground() {
         int backgroundColor = Integer.decode(ModConfig.backgroundColor);
@@ -93,8 +95,8 @@ public class ParticleScreenManager {
         final float green = (float)(backgroundColor >>  8 & 255) / 255.0F;
         final float blue  = (float)(backgroundColor       & 255) / 255.0F;
 
-        int width  = MinecraftClient.getInstance().getWindow().getScaledWidth();
-        int height = MinecraftClient.getInstance().getWindow().getScaledHeight();
+        int width  = Minecraft.getInstance().getWindow().getGuiScaledWidth();
+        int height = Minecraft.getInstance().getWindow().getGuiScaledHeight();
 
         GL11.glColor3f(red, green, blue);
 
@@ -108,12 +110,12 @@ public class ParticleScreenManager {
     private void onRenderParticles() {
         // Determine position first to make sure all the interactions match up
         if (particleMovement) {
-            Vec2f windowSize = new Vec2f(window.getScaledWidth(), window.getScaledHeight());
+            Vector2f windowSize = new Vector2f(window.getGuiScaledHeight(), window.getGuiScaledWidth());
 
             for (Particle particle : particles) {
                 particle.move();
                 RandomUtils.moveParticleIfNeeded(particle, particleBounce);
-                particle.interactWithMouse(mouseLocation, windowSize, particleBounce, particleDistanceRepelledByMouse, (float) window.getScaleFactor());
+                particle.interactWithMouse(mouseLocation, windowSize, particleBounce, particleDistanceRepelledByMouse, (float) window.getGuiScale());
             }
         }
 
